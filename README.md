@@ -28,4 +28,8 @@ Privacy: Ensure compliance with privacy laws and regulations (e.g., GDPR, CCPA).
 Terms of Service: Establish clear terms of service for users. 
 6. Ongoing Maintenance:
 Spam Detection Updates: Regularly update the spam filtering algorithms and blacklists to stay ahead of evolving spam tactics. 
-User Feedback: Gather user feedback and use it to improve the app. 
+User Feedback: Gather user feedback and use it to improve the app.
+
+Ethical concerns
+- Mistakenly block emails that aren't spam (start-up company emails)
+- discerning spam from real emails
