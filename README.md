@@ -33,3 +33,4 @@ User Feedback: Gather user feedback and use it to improve the app.
 Ethical concerns
 - Mistakenly block emails that aren't spam (start-up company emails)
 - discerning spam from real emails
+- User privacy (personal emails)
