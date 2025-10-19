@@ -4,7 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public class GlobalStats {
+public class GlobalStats 
+{
   @Id
   private Long id = 1L; // single row
 
@@ -17,21 +18,63 @@ public class GlobalStats {
   private long vocabularySize;
 
   // getters/setters
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+  public Long getId() 
+  { 
+    return id; 
+  }
 
-  public long getSpamMessages() { return spamMessages; }
-  public void setSpamMessages(long spamMessages) { this.spamMessages = spamMessages; }
+  public void setId(Long id) 
+  { 
+    this.id = id; 
+  }
 
-  public long getHamMessages() { return hamMessages; }
-  public void setHamMessages(long hamMessages) { this.hamMessages = hamMessages; }
+  public long getSpamMessages() 
+  { 
+    return spamMessages; 
+  }
 
-  public long getTotalSpamTokens() { return totalSpamTokens; }
-  public void setTotalSpamTokens(long totalSpamTokens) { this.totalSpamTokens = totalSpamTokens; }
+  public void setSpamMessages(long spamMessages) 
+  { 
+    this.spamMessages = spamMessages; 
+  }
 
-  public long getTotalHamTokens() { return totalHamTokens; }
-  public void setTotalHamTokens(long totalHamTokens) { this.totalHamTokens = totalHamTokens; }
+  public long getHamMessages() 
+  { 
+    return hamMessages; 
+  }
 
-  public long getVocabularySize() { return vocabularySize; }
-  public void setVocabularySize(long vocabularySize) { this.vocabularySize = vocabularySize; }
+  public void setHamMessages(long hamMessages) 
+  { 
+    this.hamMessages = hamMessages; 
+  }
+
+  public long getTotalSpamTokens() 
+  { 
+    return totalSpamTokens; 
+  }
+
+  public void setTotalSpamTokens(long totalSpamTokens) 
+  { 
+    this.totalSpamTokens = totalSpamTokens; 
+  }
+
+  public long getTotalHamTokens() 
+  { 
+    return totalHamTokens; 
+  }
+
+  public void setTotalHamTokens(long totalHamTokens) 
+  { 
+    this.totalHamTokens = totalHamTokens; 
+  }
+
+  public long getVocabularySize() 
+  { 
+    return vocabularySize; 
+  }
+
+  public void setVocabularySize(long vocabularySize) 
+  { 
+    this.vocabularySize = vocabularySize; 
+  }
 }

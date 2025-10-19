@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TokenStatsRepository extends JpaRepository<TokenStats, Long> {
+public interface TokenStatsRepository extends JpaRepository<TokenStats, Long> 
+{
   Optional<TokenStats> findByToken(String token);
 }

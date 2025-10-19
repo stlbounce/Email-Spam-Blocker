@@ -11,19 +11,25 @@ import com.example.server.message.Message;
 
 @Service
 @Transactional
-public class BayesService {
+public class BayesService 
+{
   private final Tokenizer tokenizer;
   private final TokenStatsRepository tokens;
   private final GlobalStatsRepository globals;
 
   private static final double ALPHA = 1.0; // Laplace smoothing
 
-  public BayesService(Tokenizer tokenizer, TokenStatsRepository tokens, GlobalStatsRepository globals) {
-    this.tokenizer = tokenizer; this.tokens = tokens; this.globals = globals;
+  public BayesService(Tokenizer tokenizer, TokenStatsRepository tokens, GlobalStatsRepository globals) 
+  {
+    this.tokenizer = tokenizer; 
+    this.tokens = tokens; 
+    this.globals = globals;
   }
 
-  private GlobalStats getOrCreateGlobals() {
-    return globals.findById(1L).orElseGet(() -> {
+  private GlobalStats getOrCreateGlobals() 
+  {
+    return globals.findById(1L).orElseGet(() -> 
+    {
       GlobalStats g = new GlobalStats();
       g.setId(1L);
       return globals.save(g);
@@ -31,26 +37,31 @@ public class BayesService {
   }
 
   // Update counts given a labeled message
-  public void train(Message msg, Message.Label label) {
+  public void train(Message msg, Message.Label label) 
+  {
     GlobalStats g = getOrCreateGlobals();
     List<String> toks = tokenizer.tokenizeAll(msg.getSender(), msg.getSubject(), msg.getBody());
 
     Set<String> newTokens = new HashSet<>();
     for (String t : toks) {
-      TokenStats ts = tokens.findByToken(t).orElseGet(() -> {
+      TokenStats ts = tokens.findByToken(t).orElseGet(() -> 
+      {
         TokenStats created = new TokenStats();
         created.setToken(t);
         newTokens.add(t);
         return created;
       });
 
-      if (label == Message.Label.SPAM) {
+      if (label == Message.Label.SPAM) 
+      {
         ts.setSpamCount(ts.getSpamCount() + 1);
         g.setTotalSpamTokens(g.getTotalSpamTokens() + 1);
-      } else if (label == Message.Label.HAM) {
-        ts.setHamCount(ts.getHamCount() + 1);
-        g.setTotalHamTokens(g.getTotalHamTokens() + 1);
-      }
+      } 
+        else if (label == Message.Label.HAM) 
+        {
+          ts.setHamCount(ts.getHamCount() + 1);
+          g.setTotalHamTokens(g.getTotalHamTokens() + 1);
+        }
       tokens.save(ts);
     }
 
@@ -62,7 +73,8 @@ public class BayesService {
   }
 
   // Return score (log-odds), probability, and spam decision (threshold)
-  public ClassificationResult classify(Message msg) {
+  public ClassificationResult classify(Message msg) 
+  {
     GlobalStats g = getOrCreateGlobals();
     long spamDocs = Math.max(1, g.getSpamMessages());
     long hamDocs  = Math.max(1, g.getHamMessages());
@@ -76,7 +88,8 @@ public class BayesService {
     double logSpam = priorSpam;
     double logHam  = priorHam;
 
-    for (String t : tokenizer.tokenizeAll(msg.getSender(), msg.getSubject(), msg.getBody())) {
+    for (String t : tokenizer.tokenizeAll(msg.getSender(), msg.getSubject(), msg.getBody())) 
+    {
       TokenStats ts = tokens.findByToken(t).orElse(null);
       long cSpam = ts == null ? 0 : ts.getSpamCount();
       long cHam  = ts == null ? 0 : ts.getHamCount();
