@@ -43,7 +43,8 @@ public class BayesService
     List<String> toks = tokenizer.tokenizeAll(msg.getSender(), msg.getSubject(), msg.getBody());
 
     Set<String> newTokens = new HashSet<>();
-    for (String t : toks) {
+    for (String t : toks) 
+    {
       TokenStats ts = tokens.findByToken(t).orElseGet(() -> 
       {
         TokenStats created = new TokenStats();

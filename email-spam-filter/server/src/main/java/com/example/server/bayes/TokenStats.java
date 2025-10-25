@@ -10,7 +10,8 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = "token"))
-public class TokenStats {
+public class TokenStats 
+{
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
@@ -21,15 +22,43 @@ public class TokenStats {
   private long hamCount;
 
   // getters/setters
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+  public Long getId() 
+  { 
+    return id; 
+  }
 
-  public String getToken() { return token; }
-  public void setToken(String token) { this.token = token; }
+  public void setId(Long id) 
+  { 
+    this.id = id; 
+  }
 
-  public long getSpamCount() { return spamCount; }
-  public void setSpamCount(long spamCount) { this.spamCount = spamCount; }
+  public String getToken() 
+  { 
+    return token; 
+  }
 
-  public long getHamCount() { return hamCount; }
-  public void setHamCount(long hamCount) { this.hamCount = hamCount; }
+  public void setToken(String token) 
+  { 
+    this.token = token; 
+  }
+
+  public long getSpamCount() 
+  { 
+    return spamCount; 
+  }
+
+  public void setSpamCount(long spamCount) 
+  { 
+    this.spamCount = spamCount; 
+  }
+
+  public long getHamCount() 
+  { 
+    return hamCount; 
+  }
+
+  public void setHamCount(long hamCount)
+  { 
+    this.hamCount = hamCount; 
+  }
 }
