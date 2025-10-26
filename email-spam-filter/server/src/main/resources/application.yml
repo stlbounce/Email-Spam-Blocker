@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/spamfilter?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: Andre622@
+    password: *********
   jpa:
     hibernate:
       ddl-auto: update   # good for development; use migrations later in prod
