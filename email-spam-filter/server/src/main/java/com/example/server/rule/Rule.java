@@ -19,15 +19,43 @@ public class Rule {
   // Action: for MVP we only use "MARK_SPAM" or "ALLOW"
   private String action;
 
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+  public Long getId() 
+  { 
+    return id; 
+  }
 
-  public String getType() { return type; }
-  public void setType(String type) { this.type = type; }
+  public void setId(Long id) 
+  { 
+    this.id = id; 
+  }
 
-  public String getValue() { return value; }
-  public void setValue(String value) { this.value = value; }
+  public String getType() 
+  { 
+    return type; 
+  }
 
-  public String getAction() { return action; }
-  public void setAction(String action) { this.action = action; }
+  public void setType(String type) 
+  { 
+    this.type = type; 
+  }
+
+  public String getValue() 
+  { 
+    return value; 
+  }
+
+  public void setValue(String value)
+  { 
+    this.value = value; 
+  }
+
+  public String getAction() 
+  { 
+    return action; 
+  }
+
+  public void setAction(String action) 
+  { 
+    this.action = action; 
+  }
 }

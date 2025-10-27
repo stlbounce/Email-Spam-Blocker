@@ -14,25 +14,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/rules")
 @CrossOrigin(origins = "*")
-public class RuleController {
+public class RuleController 
+{
   private final RuleRepository repo;
 
-  public RuleController(RuleRepository repo) {
+  public RuleController(RuleRepository repo) 
+  {
     this.repo = repo;
   }
 
   @GetMapping
-  public List<Rule> all() {
+  public List<Rule> all() 
+  {
     return repo.findAll();
   }
 
   @PostMapping
-  public Rule add(@RequestBody Rule r) {
+  public Rule add(@RequestBody Rule r) 
+  {
     return repo.save(r);
   }
 
   @DeleteMapping("/{id}")
-  public void delete(@PathVariable Long id) {
+  public void delete(@PathVariable Long id) 
+  {
     repo.deleteById(id);
   }
 }
