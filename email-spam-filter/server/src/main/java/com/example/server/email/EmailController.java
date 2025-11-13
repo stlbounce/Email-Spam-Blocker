@@ -4,11 +4,13 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.server.message.Message;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/email")
@@ -18,9 +20,13 @@ public class EmailController {
   private final EmailService service;
   public EmailController(EmailService service) { this.service = service; }
 
-  // POST /api/email/import?max=5
-  @PostMapping("/import")
-  public List<Message> importAndClassify(@RequestParam(required = false) Integer max) throws Exception {
-    return service.importAndClassify(max);
+  // Existing:
+  // @PostMapping("/import") using app props, if you kept it
+
+  // NEW: Connect with user-provided details and import+classify+save
+  // POST /api/email/connect-and-import
+  @PostMapping("/connect-and-import")
+  public List<Message> connectAndImport(@Valid @RequestBody EmailConnectRequest request) throws Exception {
+    return service.importAndClassify(request);
   }
 }

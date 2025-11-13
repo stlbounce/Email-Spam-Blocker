@@ -94,6 +94,60 @@ public class EmailService {
     return saved;
   }
 
+  @Transactional
+public List<com.example.server.message.Message> importAndClassify(EmailConnectRequest req) throws Exception {
+  int max = (req.max != null && req.max > 0) ? req.max : 5;
+
+  Properties p = new Properties();
+  p.put("mail.store.protocol", "imap");
+  p.put("mail.imap.port", String.valueOf(req.port));
+  if (req.ssl) {
+    p.put("mail.imap.ssl.enable", "true");
+    p.put("mail.imap.ssl.trust", "*");
+  } else {
+    p.put("mail.imap.starttls.enable", "true");
+  }
+  // p.put("mail.debug", "true"); // uncomment if you need protocol logs
+
+  Session session = Session.getInstance(p);
+  Store store = session.getStore("imap");
+  store.connect(req.host, req.port, req.username, req.password);
+
+  Folder folder = store.getFolder(req.folder);
+  folder.open(Folder.READ_ONLY);
+
+  int total = folder.getMessageCount();
+  if (total == 0) { folder.close(false); store.close(); return List.of(); }
+
+  int start = Math.max(1, total - max + 1);
+  jakarta.mail.Message[] msgs = folder.getMessages(start, total);
+
+  List<com.example.server.message.Message> saved = new ArrayList<>(msgs.length);
+  for (jakarta.mail.Message jm : msgs) {
+    String from = (jm.getFrom() != null && jm.getFrom().length > 0) ? jm.getFrom()[0].toString() : "";
+    String subject = jm.getSubject() == null ? "" : jm.getSubject();
+    String body = extractBody(jm);
+
+    var entity = new com.example.server.message.Message();
+    entity.setSender(from == null ? "" : from);
+    entity.setSubject(subject == null ? "" : subject);
+    entity.setBody(body == null ? "" : body);
+    entity.setLabel(com.example.server.message.Message.Label.UNKNOWN);
+    entity.setClassifiedAt(java.time.Instant.now());
+
+    var result = bayes.classify(entity);
+    entity.setIsSpam(result.isSpam());
+    entity.setScore(result.score());
+    entity.setProbability(result.probability());
+
+    saved.add(repo.save(entity));
+  }
+
+  folder.close(false);
+  store.close();
+  return saved;
+}
+
   // ---- Helpers ----
   private static String extractBody(jakarta.mail.Message message) throws Exception {
     Object content = message.getContent();
