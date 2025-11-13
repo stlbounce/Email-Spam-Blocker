@@ -33,7 +33,15 @@ build/
 .vscode/
 
 
+# Sensitive configuration files
 server/src/main/resources/application.yml
+server/src/main/resources/application-local.yml
+server/src/main/resources/application-dev.yml
 
-server/target/
-web/node_modules/
+# Build outputs & temp files
+/target/
+/server/target/
+/web/node_modules/
+/web/dist/
+
+

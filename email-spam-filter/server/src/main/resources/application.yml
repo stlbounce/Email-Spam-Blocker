@@ -13,9 +13,17 @@ spring:
 server:
   port: 8080
 
-  logging:
+  server:
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param   # add ?trace=true to see stack
+
+logging:
   level:
-    org.springframework.web: DEBUG  # show mapping lines
+    com.example.server: DEBUG
+    org.springframework.web: DEBUG
+
 
 email:
   host: ${EMAIL_HOST:imap.mail.yahoo.com}

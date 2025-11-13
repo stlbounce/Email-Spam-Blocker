@@ -9,17 +9,22 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 
 @Entity
 public class Message 
 {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
+  
+  @Column(length = 256)
   private String sender;
+
+  @Column(length = 512)
   private String subject;
 
-  @Column(length = 10000)
+  @Lob
+  @Column(columnDefinition = "LongText") //MySQL large text
   private String body;
 
   @Enumerated(EnumType.STRING)
