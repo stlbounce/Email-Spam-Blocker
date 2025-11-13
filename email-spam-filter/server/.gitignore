@@ -32,9 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-# Google OAuth credentials and tokens
-server/src/main/resources/credentials.json
-server/tokens/
 
 server/src/main/resources/application.yml
 

@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/spamfilter?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: *********
+    password: Andre622@
   jpa:
     hibernate:
       ddl-auto: update   # good for development; use migrations later in prod
@@ -12,3 +12,16 @@ spring:
 
 server:
   port: 8080
+
+  logging:
+  level:
+    org.springframework.web: DEBUG  # show mapping lines
+
+email:
+  host: ${EMAIL_HOST:imap.mail.yahoo.com}
+  port: ${EMAIL_PORT:993}
+  ssl: ${EMAIL_SSL:true}
+  folder: ${EMAIL_FOLDER:INBOX}
+  username: ${EMAIL_USER:dbd622@yahoo.com}   # leave blank by default so app still starts
+  password: ${EMAIL_PASS:mnuobohudkvvjssv}   # set via env var before calling the endpoint
+  max: ${EMAIL_MAX:5}
