@@ -31,6 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+<<<<<<< Updated upstream
 
 
 # Sensitive configuration files
@@ -45,3 +46,5 @@ server/src/main/resources/application-dev.yml
 /web/dist/
 
 
+=======
+>>>>>>> Stashed changes

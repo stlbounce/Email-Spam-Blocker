@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { useEffect, useState } from "react";
 import { api } from "./api";
 
@@ -83,4 +84,12 @@ export default function App() {
       </section>
     </div>
   );
+=======
+import React from 'react';
+import EmailImportApp from './EmailImportApp.jsx'; 
+import './index.css';
+
+export default function App() {
+  return <EmailImportApp />;
+>>>>>>> Stashed changes
 }

@@ -9,13 +9,17 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+<<<<<<< Updated upstream
 import jakarta.persistence.Lob;
+=======
+>>>>>>> Stashed changes
 
 @Entity
 public class Message 
 {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+<<<<<<< Updated upstream
   
   @Column(length = 256)
   private String sender;
@@ -25,6 +29,13 @@ public class Message
 
   @Lob
   @Column(columnDefinition = "LongText") //MySQL large text
+=======
+
+  private String sender;
+  private String subject;
+
+  @Column(length = 10000)
+>>>>>>> Stashed changes
   private String body;
 
   @Enumerated(EnumType.STRING)

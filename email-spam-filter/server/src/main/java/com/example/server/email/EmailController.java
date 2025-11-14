@@ -12,6 +12,10 @@ import com.example.server.message.Message;
 
 import jakarta.validation.Valid;
 
+<<<<<<< Updated upstream
+=======
+@CrossOrigin(origins = "*")
+>>>>>>> Stashed changes
 @RestController
 @RequestMapping("/api/email")
 @CrossOrigin(origins = "*")

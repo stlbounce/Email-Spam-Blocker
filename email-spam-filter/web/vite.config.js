@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+<<<<<<< Updated upstream
+=======
+import tailwindcss from '@tailwindcss/vite'
+>>>>>>> Stashed changes
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,5 +13,9 @@ export default defineConfig({
         plugins: [['babel-plugin-react-compiler']],
       },
     }),
+<<<<<<< Updated upstream
+=======
+    tailwindcss(),
+>>>>>>> Stashed changes
   ],
 })
