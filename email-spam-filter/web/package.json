@@ -11,6 +11,10 @@
   },
   "dependencies": {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    "lucide-react": "^0.553.0",
+>>>>>>> Stashed changes
 =======
     "lucide-react": "^0.553.0",
 >>>>>>> Stashed changes
@@ -20,15 +24,21 @@
   "devDependencies": {
     "@eslint/js": "^9.36.0",
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
 =======
+=======
+>>>>>>> Stashed changes
     "@tailwindcss/postcss": "^4.1.17",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
     "autoprefixer": "^10.4.22",
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "eslint": "^9.36.0",
@@ -36,6 +46,11 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.4.0",
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17",
+>>>>>>> Stashed changes
 =======
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",

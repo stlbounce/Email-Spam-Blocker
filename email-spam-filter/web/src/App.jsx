@@ -1,4 +1,5 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { useEffect, useState } from "react";
 import { api } from "./api";
 
@@ -85,11 +86,16 @@ export default function App() {
     </div>
   );
 =======
+=======
+>>>>>>> Stashed changes
 import React from 'react';
 import EmailImportApp from './EmailImportApp.jsx'; 
 import './index.css';
 
 export default function App() {
   return <EmailImportApp />;
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }

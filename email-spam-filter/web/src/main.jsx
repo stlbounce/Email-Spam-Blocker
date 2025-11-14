@@ -1,4 +1,5 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
@@ -9,6 +10,8 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 =======
+=======
+>>>>>>> Stashed changes
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'          // <-- Tailwind comes in here
@@ -18,5 +21,8 @@ createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 )

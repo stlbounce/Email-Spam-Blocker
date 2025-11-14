@@ -13,6 +13,10 @@ import com.example.server.message.Message;
 import jakarta.validation.Valid;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+@CrossOrigin(origins = "*")
+>>>>>>> Stashed changes
 =======
 @CrossOrigin(origins = "*")
 >>>>>>> Stashed changes

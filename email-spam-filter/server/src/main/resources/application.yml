@@ -3,7 +3,11 @@ spring:
     url: jdbc:mysql://localhost:3306/spamfilter?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     password: Andre622@
+=======
+    password: *********
+>>>>>>> Stashed changes
 =======
     password: *********
 >>>>>>> Stashed changes
@@ -16,6 +20,7 @@ spring:
 
 server:
   port: 8080
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 
   server:
@@ -38,5 +43,7 @@ email:
   username: ${EMAIL_USER:dbd622@yahoo.com}   # leave blank by default so app still starts
   password: ${EMAIL_PASS:mnuobohudkvvjssv}   # set via env var before calling the endpoint
   max: ${EMAIL_MAX:5}
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

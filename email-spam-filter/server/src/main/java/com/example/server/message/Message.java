@@ -10,7 +10,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import jakarta.persistence.Lob;
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 
@@ -19,6 +22,7 @@ public class Message
 {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
   
   @Column(length = 256)
@@ -30,11 +34,16 @@ public class Message
   @Lob
   @Column(columnDefinition = "LongText") //MySQL large text
 =======
+=======
+>>>>>>> Stashed changes
 
   private String sender;
   private String subject;
 
   @Column(length = 10000)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   private String body;
 
