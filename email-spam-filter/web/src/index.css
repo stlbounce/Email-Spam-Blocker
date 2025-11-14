@@ -1,2 +1,9 @@
 @import "tailwindcss";
+
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 150ms;
+  transition-timing-function: ease-in-out;
+}
+
 html, body, #root { height: 100%; }
