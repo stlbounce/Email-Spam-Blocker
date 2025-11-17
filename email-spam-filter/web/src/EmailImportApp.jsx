@@ -2,16 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { CheckCircle, MoveRight, ShieldAlert, Mail, Lock, Server, RefreshCw, Loader2 } from "lucide-react";
 
 /**
- * EmailImportApp (dark + sleek + labeling)
- * - Connects to IMAP via POST /api/email/connect-and-import
+ * EmailImportApp (dark + sleek + labeling + large viewport)
+ * - Connects via POST /api/email/connect-and-import
  * - Lists classified emails
- * - Lets the user label each email (SPAM/HAM), which trains your Bayes model:
- *     POST /api/messages/{id}/label?value=SPAM|HAM
+ * - Lets users label (SPAM/HAM): POST /api/messages/{id}/label?value=SPAM|HAM
  */
 
 const API_URL = import.meta.env?.VITE_API_URL || "http://127.0.0.1:8080";
 
-/* Presets for common providers */
+/* Presets */
 const PROVIDER_PRESETS = {
   Yahoo:   { host: "imap.mail.yahoo.com",   port: 993, ssl: true, folder: "INBOX", note: "Use a Yahoo App Password (not your normal password)." },
   Gmail:   { host: "imap.gmail.com",        port: 993, ssl: true, folder: "INBOX", note: "Use a Google App Password if 2FA is on." },
@@ -20,11 +19,10 @@ const PROVIDER_PRESETS = {
   Custom:  { host: "", port: 993, ssl: true, folder: "INBOX" },
 };
 
-/* ---------- UI bits (dark-aware) ---------- */
+/* UI bits */
 function FieldLabel({ children }) {
   return <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{children}</label>;
 }
-
 function Input(props) {
   return (
     <input
@@ -38,7 +36,6 @@ function Input(props) {
     />
   );
 }
-
 function Select(props) {
   return (
     <select
@@ -52,7 +49,6 @@ function Select(props) {
     />
   );
 }
-
 function Checkbox({ checked, onChange, id }) {
   return (
     <input
@@ -64,7 +60,6 @@ function Checkbox({ checked, onChange, id }) {
     />
   );
 }
-
 function Badge({ children, tone = "gray" }) {
   const tones = {
     gray:  "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100",
@@ -76,7 +71,7 @@ function Badge({ children, tone = "gray" }) {
   return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tones[tone]}`}>{children}</span>;
 }
 
-/* ---------- Dark mode toggle (persisted) ---------- */
+/* Dark mode toggle */
 function applyTheme(mode) {
   const root = document.documentElement;
   if (mode === "dark") root.classList.add("dark");
@@ -106,7 +101,7 @@ function ThemeToggle() {
   );
 }
 
-/* ---------- Main component ---------- */
+/* Main component */
 export default function EmailImportApp() {
   const [provider, setProvider] = useState("Yahoo");
   const [host, setHost] = useState(PROVIDER_PRESETS.Yahoo.host);
@@ -120,9 +115,9 @@ export default function EmailImportApp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [rows, setRows] = useState([]);
-  const [labelingIds, setLabelingIds] = useState(() => new Set()); // track rows being labeled
+  const [labelingIds, setLabelingIds] = useState(() => new Set());
 
-  /* When provider changes, auto-fill fields */
+  /* Apply preset when provider changes */
   useEffect(() => {
     const p = PROVIDER_PRESETS[provider]; if (!p) return;
     setHost(p.host); setPort(p.port); setSsl(p.ssl); setFolder(p.folder);
@@ -173,15 +168,13 @@ export default function EmailImportApp() {
   /* Label + train one message */
   async function labelMessage(id, value) {
     if (!id) return;
-    // mark loading for this id
-    setLabelingIds(prev => new Set(prev).add(id));
-    // optimistic UI
-    setRows(prev => prev.map(r => r.id === id ? { ...r, label: value } : r));
+    setLabelingIds(prev => new Set(prev).add(id));                     // mark busy
+    setRows(prev => prev.map(r => r.id === id ? { ...r, label: value } : r)); // optimistic
     try {
       const res = await fetch(`${API_URL}/api/messages/${id}/label?value=${value}`, { method: "POST" });
       const text = await res.text();
       if (!res.ok) {
-        // rollback label on failure
+        // rollback on error
         setRows(prev => prev.map(r => r.id === id ? { ...r, label: undefined } : r));
         try { setError(JSON.parse(text).message || `${res.status} ${res.statusText}`); }
         catch { setError(text || `${res.status} ${res.statusText}`); }
@@ -191,13 +184,13 @@ export default function EmailImportApp() {
       if (updated) setRows(prev => prev.map(r => r.id === id ? { ...r, ...updated } : r));
     } catch (err) {
       setError(err?.message || "Network error");
-      // rollback label
       setRows(prev => prev.map(r => r.id === id ? { ...r, label: undefined } : r));
     } finally {
       setLabelingIds(prev => { const n = new Set(prev); n.delete(id); return n; });
     }
   }
 
+  /* Actions cell */
   const actionsCell = (r) => {
     const busy = labelingIds.has(r.id);
     return (
@@ -224,8 +217,8 @@ export default function EmailImportApp() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-[100svh] bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <header className="flex items-center gap-3 mb-6">
           <ShieldAlert className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
@@ -233,7 +226,7 @@ export default function EmailImportApp() {
           <ThemeToggle />
         </header>
 
-        {/* Card: Form */}
+        {/* Form card */}
         <div className="bg-white dark:bg-gray-900/60 rounded-2xl shadow-md border border-gray-200 dark:border-gray-800 p-6 mb-8">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
@@ -290,7 +283,7 @@ export default function EmailImportApp() {
               <Input type="number" value={max} min={1} max={100} onChange={(e) => setMax(Number(e.target.value))} />
             </div>
 
-            <div className="md:col-span-2 flex items-center gap-3 pt-2">
+            <div className="md:col-span-2 flex flex-wrap items-center gap-3 pt-2">
               <button
                 type="submit"
                 className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 hover:bg-indigo-700 dark:hover:bg-indigo-400 disabled:opacity-50"
@@ -328,10 +321,10 @@ export default function EmailImportApp() {
           ))}
         </div>
 
-        {/* Results */}
-        <div className="bg-white dark:bg-gray-900/60 rounded-2xl shadow-md border border-gray-200 dark:border-gray-800 overflow-hidden">
+        {/* Results (scrollable, sticky header, big viewport) */}
+        <div className="bg-white dark:bg-gray-900/60 rounded-2xl shadow-md border border-gray-200 dark:border-gray-800 overflow-x-auto max-h-[75vh] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-            <thead className="bg-gray-50 dark:bg-gray-900">
+            <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0 z-10">
               <tr>
                 {["Sender","Subject","Spam","Probability","Score","Classified","Actions"].map(h => (
                   <th key={h} className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{h}</th>
