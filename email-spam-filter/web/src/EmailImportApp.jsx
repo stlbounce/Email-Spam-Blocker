@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { CheckCircle, MoveRight, ShieldAlert, Mail, Lock, Server, RefreshCw, Loader2 } from "lucide-react";
 
 /**
- * EmailImportApp (dark + sleek + labeling + large viewport)
+ * EmailImportApp 
  * - Connects via POST /api/email/connect-and-import
  * - Lists classified emails
  * - Lets users label (SPAM/HAM): POST /api/messages/{id}/label?value=SPAM|HAM

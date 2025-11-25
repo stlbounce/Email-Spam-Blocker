@@ -1,32 +1,23 @@
 package com.example.server.email;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.server.message.Message;
-
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/email")
 @CrossOrigin(origins = "*")
 public class EmailController {
 
-  private final EmailService service;
-  public EmailController(EmailService service) { this.service = service; }
+  private final EmailService emailService;
 
-  // Existing:
-  // @PostMapping("/import") using app props, if you kept it
+  // ✅ constructor injection so 'emailService' exists
+  public EmailController(EmailService emailService) {
+    this.emailService = emailService;
+  }
 
-  // NEW: Connect with user-provided details and import+classify+save
-  // POST /api/email/connect-and-import
   @PostMapping("/connect-and-import")
-  public List<Message> connectAndImport(@Valid @RequestBody EmailConnectRequest request) throws Exception {
-    return service.importAndClassify(request);
+  public List<Message> connectAndImport(@RequestBody EmailConnectRequest req) throws Exception {
+    return emailService.connectAndImportFast(req);
   }
 }

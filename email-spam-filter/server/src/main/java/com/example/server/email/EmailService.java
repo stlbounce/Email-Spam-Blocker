@@ -2,168 +2,164 @@ package com.example.server.email;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.server.bayes.BayesService;
 import com.example.server.message.Message;
+import com.example.server.message.Message.Label;
 import com.example.server.message.MessageRepository;
+import com.example.server.message.MessageStreamService;
 
-import jakarta.mail.BodyPart;
+import jakarta.mail.Address;
+import jakarta.mail.FetchProfile;
 import jakarta.mail.Folder;
-import jakarta.mail.Multipart;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
-import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.InternetAddress;
 
 @Service
 public class EmailService {
 
-  private final EmailProperties props;
+  private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+
   private final MessageRepository repo;
   private final BayesService bayes;
+  @Nullable
+  private final MessageStreamService stream; // optional
 
-  public EmailService(EmailProperties props, MessageRepository repo, BayesService bayes) {
-    this.props = props;
+  public EmailService(
+      MessageRepository repo,
+      BayesService bayes,
+      @Autowired(required = false) @Nullable MessageStreamService stream
+  ) {
     this.repo = repo;
     this.bayes = bayes;
-  }
-
-  /** Fetch latest N emails, classify with Bayes, save to MySQL, return saved rows. */
-  @Transactional
-  public List<Message> importAndClassify(Integer overrideMax) throws Exception {
-    int max = (overrideMax != null && overrideMax > 0) ? overrideMax : props.getMax();
-
-    // ---- IMAP properties ----
-    Properties p = new Properties();
-    p.put("mail.store.protocol", "imap");
-    p.put("mail.imap.port", String.valueOf(props.getPort()));
-    if (props.isSsl()) {
-      p.put("mail.imap.ssl.enable", "true");
-      p.put("mail.imap.ssl.trust", "*"); // helps with some certs
-    } else {
-      p.put("mail.imap.starttls.enable", "true");
-    }
-
-    Session session = Session.getInstance(p);
-    Store store = session.getStore("imap");
-    store.connect(props.getHost(), props.getPort(), props.getUsername(), props.getPassword());
-
-    Folder folder = store.getFolder(props.getFolder());
-    folder.open(Folder.READ_ONLY);
-
-    int total = folder.getMessageCount();
-    if (total == 0) {
-      folder.close(false);
-      store.close();
-      return List.of();
-    }
-
-    int start = Math.max(1, total - max + 1);
-    jakarta.mail.Message[] msgs = folder.getMessages(start, total);
-
-    List<Message> saved = new ArrayList<>(msgs.length);
-    for (jakarta.mail.Message jm : msgs) {
-      String from = (jm.getFrom() != null && jm.getFrom().length > 0) ? jm.getFrom()[0].toString() : "";
-      String subject = jm.getSubject() == null ? "" : jm.getSubject();
-      String body = extractBody(jm);
-
-      // Build your JPA entity
-      Message m = new Message();
-      m.setSender(from);
-      m.setSubject(subject);
-      m.setBody(body);
-      m.setLabel(Message.Label.UNKNOWN);   // you can change this later after user feedback
-      m.setClassifiedAt(Instant.now());
-
-      // Run Bayes
-      var r = bayes.classify(m);
-      m.setIsSpam(r.isSpam());
-      m.setScore(r.score());
-      m.setProbability(r.probability());
-
-      // Persist
-      saved.add(repo.save(m));
-    }
-
-    folder.close(false);
-    store.close();
-    return saved;
+    this.stream = stream;
   }
 
   @Transactional
-public List<com.example.server.message.Message> importAndClassify(EmailConnectRequest req) throws Exception {
-  int max = (req.max != null && req.max > 0) ? req.max : 5;
+  public List<Message> connectAndImportFast(EmailConnectRequest req) throws Exception {
+    long t0 = System.currentTimeMillis();
+    log.info("[EMAIL] connectAndImportFast CALLED: host={}, user={}, folder={}, max={}",
+        req.getHost(), req.getUsername(), req.getFolder(), req.getMax());
 
-  Properties p = new Properties();
-  p.put("mail.store.protocol", "imap");
-  p.put("mail.imap.port", String.valueOf(req.port));
-  if (req.ssl) {
-    p.put("mail.imap.ssl.enable", "true");
-    p.put("mail.imap.ssl.trust", "*");
-  } else {
-    p.put("mail.imap.starttls.enable", "true");
-  }
-  // p.put("mail.debug", "true"); // uncomment if you need protocol logs
+    boolean useSsl = req.getSsl() == null ? true : Boolean.TRUE.equals(req.getSsl());
 
-  Session session = Session.getInstance(p);
-  Store store = session.getStore("imap");
-  store.connect(req.host, req.port, req.username, req.password);
+    Properties props = new Properties();
+    props.put("mail.store.protocol", "imap");
+    props.put("mail.imap.ssl.enable", String.valueOf(useSsl));
+    props.put("mail.imap.connectiontimeout", "10000"); // 10s
+    props.put("mail.imap.timeout", "15000");           // 15s
 
-  Folder folder = store.getFolder(req.folder);
-  folder.open(Folder.READ_ONLY);
+    Session session = Session.getInstance(props);
+    Store store = null;
+    Folder folder = null;
 
-  int total = folder.getMessageCount();
-  if (total == 0) { folder.close(false); store.close(); return List.of(); }
+    try {
+      // 1) Connect
+      store = session.getStore("imap");
+      store.connect(
+          req.getHost(),
+          req.getPort(),
+          req.getUsername(),
+          req.getPassword()
+      );
+      long tConnect = System.currentTimeMillis();
+      log.info("[EMAIL] Connected in {} ms", (tConnect - t0));
 
-  int start = Math.max(1, total - max + 1);
-  jakarta.mail.Message[] msgs = folder.getMessages(start, total);
+      // 2) Open folder
+      String folderName = (req.getFolder() == null || req.getFolder().isBlank())
+          ? "INBOX"
+          : req.getFolder();
 
-  List<com.example.server.message.Message> saved = new ArrayList<>(msgs.length);
-  for (jakarta.mail.Message jm : msgs) {
-    String from = (jm.getFrom() != null && jm.getFrom().length > 0) ? jm.getFrom()[0].toString() : "";
-    String subject = jm.getSubject() == null ? "" : jm.getSubject();
-    String body = extractBody(jm);
+      folder = store.getFolder(folderName);
+      folder.open(Folder.READ_ONLY);
 
-    var entity = new com.example.server.message.Message();
-    entity.setSender(from == null ? "" : from);
-    entity.setSubject(subject == null ? "" : subject);
-    entity.setBody(body == null ? "" : body);
-    entity.setLabel(com.example.server.message.Message.Label.UNKNOWN);
-    entity.setClassifiedAt(java.time.Instant.now());
+      int total = folder.getMessageCount();
+      if (total == 0) {
+        log.info("[EMAIL] Folder empty");
+        return Collections.emptyList();
+      }
 
-    var result = bayes.classify(entity);
-    entity.setIsSpam(result.isSpam());
-    entity.setScore(result.score());
-    entity.setProbability(result.probability());
+      int max = (req.getMax() != null && req.getMax() > 0) ? req.getMax() : 5;
+      int start = Math.max(1, total - max + 1);
+      log.info("[EMAIL] Folder has {} messages, fetching {} ({}..{})", total, max, start, total);
 
-    saved.add(repo.save(entity));
-  }
+      jakarta.mail.Message[] slice = folder.getMessages(start, total);
 
-  folder.close(false);
-  store.close();
-  return saved;
-}
+      // 3) Fetch headers only
+      FetchProfile fp = new FetchProfile();
+      fp.add(FetchProfile.Item.ENVELOPE);
+      fp.add(FetchProfile.Item.FLAGS);
+      folder.fetch(slice, fp);
+      long tFetched = System.currentTimeMillis();
+      log.info("[EMAIL] IMAP fetch of {} msgs took {} ms", slice.length, (tFetched - tConnect));
 
-  // ---- Helpers ----
-  private static String extractBody(jakarta.mail.Message message) throws Exception {
-    Object content = message.getContent();
-    if (content instanceof String s) return s;
-    if (content instanceof Multipart mp) return extractFromMultipart(mp);
-    return "";
-  }
+      // 4) Map & classify
+      List<Message> toSave = new ArrayList<>(slice.length);
+      for (jakarta.mail.Message jm : slice) {
+        String sender = "(unknown)";
+        try {
+          Address[] froms = jm.getFrom();
+          if (froms != null && froms.length > 0) {
+            Address a = froms[0];
+            if (a instanceof InternetAddress ia) {
+              String name = ia.getPersonal();
+              sender = (name != null && !name.isBlank())
+                  ? (name + " <" + ia.getAddress() + ">")
+                  : ia.getAddress();
+            } else {
+              sender = a.toString();
+            }
+          }
+        } catch (Exception ignored) {}
 
-  private static String extractFromMultipart(Multipart mp) throws Exception {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < mp.getCount(); i++) {
-      BodyPart part = mp.getBodyPart(i);
-      Object pc = part.getContent();
-      if (pc instanceof String s) sb.append(s).append('\n');
-      else if (pc instanceof MimeMultipart nested) sb.append(extractFromMultipart(nested));
+        String subject = Optional.ofNullable(jm.getSubject()).orElse("(no subject)");
+
+        Message entity = new Message();
+        entity.setSender(sender);
+        entity.setSubject(subject);
+        entity.setBody(null);
+        entity.setLabel(Label.UNKNOWN);
+
+        var result = bayes.classify(entity);
+        entity.setIsSpam(result.isSpam());
+        entity.setScore(result.score());
+        entity.setProbability(result.probability());
+        entity.setClassifiedAt(Instant.now());
+
+        toSave.add(entity);
+      }
+
+      long tClassified = System.currentTimeMillis();
+      log.info("[EMAIL] Classified {} msgs in {} ms", toSave.size(), (tClassified - tFetched));
+
+      // 5) Save
+      List<Message> saved = repo.saveAll(toSave);
+      long tSaved = System.currentTimeMillis();
+      log.info("[EMAIL] Saved in DB in {} ms", (tSaved - tClassified));
+      log.info("[EMAIL] TOTAL connectAndImportFast time: {} ms", (tSaved - t0));
+
+      // 6) Optional streaming
+      if (stream != null) {
+        saved.forEach(stream::publish);
+      }
+
+      return saved;
+
+    } finally {
+      try { if (folder != null && folder.isOpen()) folder.close(false); } catch (Exception ignored) {}
+      try { if (store != null && store.isConnected()) store.close(); } catch (Exception ignored) {}
     }
-    return sb.toString();
   }
 }

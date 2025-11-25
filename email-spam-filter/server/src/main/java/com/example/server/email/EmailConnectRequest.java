@@ -1,18 +1,77 @@
 package com.example.server.email;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-
+/**
+ * DTO for /api/email/connect-and-import
+ * Used by EmailService.connectAndImportFast
+ */
 public class EmailConnectRequest {
-  @NotBlank public String host;     // e.g. imap.mail.yahoo.com
-  @Min(1)  public int port = 993;   // typically 993 for SSL IMAP
-  public boolean ssl = true;        // SSL on/off
-  @NotBlank public String folder = "INBOX";
+  private String host;
+  private Integer port;
+  // use wrapper so it can be null, but default to true
+  private Boolean ssl = Boolean.TRUE;
+  private String folder = "INBOX";
+  private String username;
+  private String password;
+  private Integer max = 5;
 
-  @NotBlank public String username; // full email address
-  @NotBlank public String password; // app password (providers require this)
+  public String getHost() {
+    return host;
+  }
 
-  @Min(1) public Integer max = 20;   // how many to import
+  public void setHost(String host) {
+    this.host = host;
+  }
 
-  // getters/setters if you’re not using lombok
+  public Integer getPort() {
+    return port;
+  }
+
+  public void setPort(Integer port) {
+    this.port = port;
+  }
+
+  public Boolean getSsl() {
+    return ssl;
+  }
+
+  public void setSsl(Boolean ssl) {
+    this.ssl = ssl;
+  }
+
+  // convenience for boolean-style access if you ever need it
+  public boolean isSsl() {
+    return Boolean.TRUE.equals(ssl);
+  }
+
+  public String getFolder() {
+    return folder;
+  }
+
+  public void setFolder(String folder) {
+    this.folder = folder;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public Integer getMax() {
+    return max;
+  }
+
+  public void setMax(Integer max) {
+    this.max = max;
+  }
 }

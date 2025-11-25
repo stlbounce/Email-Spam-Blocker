@@ -4,11 +4,15 @@ spring:
     username: root
     password: Andre622@
   jpa:
-    hibernate:
-      ddl-auto: update   # good for development; use migrations later in prod
-    show-sql: true
     properties:
-      hibernate.format_sql: true
+      hibernate.jdbc.batch_size: 50
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.generate_statistics: false
+      show-sql: false  # big speed boost vs console spam
+    
+    mvc:
+        log-request-details: false
 
 server:
   port: 8080
@@ -22,7 +26,11 @@ server:
 logging:
   level:
     com.example.server: DEBUG
-    org.springframework.web: DEBUG
+    org.hibernate.SQL: WARN
+    org.springframework.web.filter.CommonsRequestLoggingFilter: OFF
+    root: INFO
+    org.springframework.web: INFO
+    com.example.server.email: INFO
 
 
 email:
@@ -33,3 +41,6 @@ email:
   username: ${EMAIL_USER:dbd622@yahoo.com}   # leave blank by default so app still starts
   password: ${EMAIL_PASS:mnuobohudkvvjssv}   # set via env var before calling the endpoint
   max: ${EMAIL_MAX:5}
+  
+
+
