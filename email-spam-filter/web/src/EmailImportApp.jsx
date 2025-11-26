@@ -102,7 +102,7 @@ function ThemeToggle() {
 }
 
 /* Main component */
-export default function EmailImportApp() {
+export default function EmailImportApp({onImported}) {
   const [provider, setProvider] = useState("Yahoo");
   const [host, setHost] = useState(PROVIDER_PRESETS.Yahoo.host);
   const [port, setPort] = useState(PROVIDER_PRESETS.Yahoo.port);
@@ -156,6 +156,9 @@ export default function EmailImportApp() {
       }
       const data = text ? JSON.parse(text) : [];
       setRows(data);
+      if (typeof onImported === "function") {
+        onImported();
+      }
     } catch (err) {
       setError(err?.message || "Network error");
     } finally {
