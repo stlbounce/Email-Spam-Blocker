@@ -1,0 +1,10 @@
+{
+  "name": "email-spam-filter-root",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix web\" \"mvn -f server/pom.xml spring-boot:run\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

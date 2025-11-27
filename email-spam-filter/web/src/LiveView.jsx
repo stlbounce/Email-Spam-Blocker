@@ -116,7 +116,7 @@ export default function LiveView() {
         </div>
 
         <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-          Tip: Open another tab and run an import/classify — new rows will appear here instantly.
+          Open another tab and run an import/classify — new rows will appear here instantly.
         </p>
       </div>
     </div>
